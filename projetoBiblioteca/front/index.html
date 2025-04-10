@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Biblioteca</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .tab-button.active {
+            background-color: #0056b3;
+        }
+
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.delete {
+            background-color: #dc3545;
+        }
+
+        .list-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .item-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema Biblioteca - Teste Endpoints</h1>
+    
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('clientes')">Clientes</button>
+        <button class="tab-button" onclick="showTab('livros')">Livros</button>
+        <button class="tab-button" onclick="showTab('emprestimos')">Empréstimos</button>
+    </div>
+
+    <!-- Clientes Tab -->
+    <div id="clientes" class="tab-content">
+        <div class="form-container">
+            <h2>Cadastrar Cliente</h2>
+            <form id="clienteForm" onsubmit="event.preventDefault(); handleClienteSubmit()">
+                <div class="form-group">
+                    <input type="text" id="clienteNome" placeholder="Nome" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="clienteSobrenome" placeholder="Sobrenome" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="clienteCpf" placeholder="CPF" required>
+                </div>
+                <button type="submit">Salvar Cliente</button>
+            </form>
+        </div>
+
+        <div class="list-container">
+            <h2>Clientes Cadastrados</h2>
+            <div id="clientesList"></div>
+        </div>
+    </div>
+
+    <!-- Livros Tab -->
+    <div id="livros" class="tab-content" style="display:none;">
+        <div class="form-container">
+            <h2>Cadastrar Livro</h2>
+            <form id="livroForm" onsubmit="event.preventDefault(); handleLivroSubmit()">
+                <div class="form-group">
+                    <input type="text" id="livroAutor" placeholder="Autor" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="livroIsbn" placeholder="ISBN" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="livroGenero" placeholder="Gênero" required>
+                </div>
+                <button type="submit">Salvar Livro</button>
+            </form>
+        </div>
+
+        <div class="list-container">
+            <h2>Livros Cadastrados</h2>
+            <div id="livrosList"></div>
+        </div>
+    </div>
+
+    <!-- Empréstimos Tab -->
+    <div id="emprestimos" class="tab-content" style="display:none;">
+        <div class="form-container">
+            <h2>Novo Empréstimo</h2>
+            <form id="emprestimoForm" onsubmit="event.preventDefault(); handleEmprestimoSubmit()">
+                <div class="form-group">
+                    <input type="number" id="emprestimoClienteId" placeholder="ID do Cliente" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="emprestimoIsbns" placeholder="ISBNs dos Livros (separados por vírgula)" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="emprestimoDataInicial" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="emprestimoDataDevolucao" required>
+                </div>
+                <button type="submit">Criar Empréstimo</button>
+            </form>
+        </div>
+
+        <div class="list-container">
+            <h2>Consultar Livros por Empréstimo</h2>
+            <div class="form-group">
+                <input type="number" id="consultaEmprestimoId" placeholder="ID do Empréstimo">
+                <button onclick="consultarLivrosPorEmprestimo()">Consultar</button>
+            </div>
+            <div id="livrosEmprestimoList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Funções para controle das abas
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Configurações base
+const API_BASE = 'http://localhost:8080';
+
+// Helpers genéricos
+async function fetchData(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        alert(`Erro: ${error.message}`);
+        throw error;
+    }
+}
+
+function createItemCard(item, fields, deleteHandler) {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = fields.map(field => `<p>${field.label}: ${item[field.key]}</p>`).join('');
+    
+    if (deleteHandler) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete';
+        deleteBtn.textContent = 'Excluir';
+        deleteBtn.onclick = () => deleteHandler(item.id);
+        card.appendChild(deleteBtn);
+    }
+    
+    return card;
+}
+
+// Clientes
+async function handleClienteSubmit() {
+    const cliente = {
+        nome: document.getElementById('clienteNome').value,
+        sobrenome: document.getElementById('clienteSobrenome').value,
+        cpf: document.getElementById('clienteCpf').value
+    };
+
+    await fetchData(`${API_BASE}/cliente`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cliente)
+    });
+    loadClientes();
+}
+
+async function loadClientes() {
+    const clientes = await fetchData(`${API_BASE}/cliente`);
+    const list = document.getElementById('clientesList');
+    list.innerHTML = '';
+    clientes.forEach(cliente => {
+        list.appendChild(createItemCard(cliente, [
+            { label: 'Nome', key: 'nome' },
+            { label: 'Sobrenome', key: 'sobrenome' },
+            { label: 'CPF', key: 'cpf' }
+        ], deleteCliente));
+    });
+}
+
+async function deleteCliente(id) {
+    await fetchData(`${API_BASE}/cliente/${id}`, { method: 'DELETE' });
+    loadClientes();
+}
+
+// Livros
+async function handleLivroSubmit() {
+    const livro = {
+        autor: document.getElementById('livroAutor').value,
+        isbn: document.getElementById('livroIsbn').value,
+        genero: document.getElementById('livroGenero').value
+    };
+
+    await fetchData(`${API_BASE}/livro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(livro)
+    });
+    loadLivros();
+}
+
+async function loadLivros() {
+    const livros = await fetchData(`${API_BASE}/livro`);
+    const list = document.getElementById('livrosList');
+    list.innerHTML = '';
+    livros.forEach(livro => {
+        list.appendChild(createItemCard(livro, [
+            { label: 'Autor', key: 'autor' },
+            { label: 'ISBN', key: 'isbn' },
+            { label: 'Gênero', key: 'genero' }
+        ], deleteLivro));
+    });
+}
+
+async function deleteLivro(id) {
+    await fetchData(`${API_BASE}/livro/${id}`, { method: 'DELETE' });
+    loadLivros();
+}
+
+// Empréstimos
+async function handleEmprestimoSubmit() {
+    const emprestimo = {
+        clienteId: parseInt(document.getElementById('emprestimoClienteId').value),
+        isbns: document.getElementById('emprestimoIsbns').value.split(',').map(Number),
+        dataInicial: document.getElementById('emprestimoDataInicial').value,
+        dataDevolucao: document.getElementById('emprestimoDataDevolucao').value
+    };
+
+    await fetchData(`${API_BASE}/emprestimo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emprestimo)
+    });
+    alert('Empréstimo criado com sucesso!');
+}
+
+async function consultarLivrosPorEmprestimo() {
+    const emprestimoId = document.getElementById('consultaEmprestimoId').value;
+    const livros = await fetchData(`${API_BASE}/livro/por-emprestimo/${emprestimoId}`);
+    const list = document.getElementById('livrosEmprestimoList');
+    list.innerHTML = '';
+    livros.forEach(livro => {
+        list.appendChild(createItemCard(livro, [
+            { label: 'Autor', key: 'autor' },
+            { label: 'ISBN', key: 'isbn' }
+        ]));
+    });
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    loadClientes();
+    loadLivros();
+});
+    </script>
+</body>
+</html>
