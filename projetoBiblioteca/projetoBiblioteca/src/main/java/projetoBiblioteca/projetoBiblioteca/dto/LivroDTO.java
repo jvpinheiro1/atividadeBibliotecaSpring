@@ -1,20 +1,37 @@
 package projetoBiblioteca.projetoBiblioteca.dto;
 
 import projetoBiblioteca.projetoBiblioteca.model.Livro;
+import projetoBiblioteca.projetoBiblioteca.model.Emprestimo;  // ← Adicione esta linha
+
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LivroDTO {
     private String autor;
     private Long isbn;
     private String genero;
+    private List<EmprestimoDTO> emprestimos;
 
-    public static Livro fromDTO(LivroDTO livroDTOdto) {
+    public static LivroDTO fromEntity(Livro livro) {
+        LivroDTO dto = new LivroDTO();
+        dto.setAutor(livro.getAutor());
+        dto.setIsbn(livro.getIsbn());
+        dto.setGenero(livro.getGenero());
+
+        if(livro.getEmprestimoLivros() != null) {
+            dto.setEmprestimos(livro.getEmprestimoLivros().stream()
+                    .map(empLivro -> EmprestimoDTO.fromEntity(empLivro.getEmprestimo())) // Converter para DTO
+                    .collect(Collectors.toList()));
+        }
+        return dto;
+    }
+    public static Livro fromDTO(LivroDTO dto) {
         Livro livro = new Livro();
-        livro.setAutor(livroDTOdto.getAutor());
-        livro.setIsbn(livroDTOdto.getIsbn());
-        livro.setGenero(livroDTOdto.getGenero());
+        livro.setAutor(dto.getAutor());
+        livro.setIsbn(dto.getIsbn());
+        livro.setGenero(dto.getGenero());
         return livro;
     }
 
@@ -40,5 +57,13 @@ public class LivroDTO {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public List<EmprestimoDTO> getEmprestimos() {
+        return emprestimos;
+    }
+
+    public void setEmprestimos(List<EmprestimoDTO> emprestimos) {
+        this.emprestimos = emprestimos;
     }
 }

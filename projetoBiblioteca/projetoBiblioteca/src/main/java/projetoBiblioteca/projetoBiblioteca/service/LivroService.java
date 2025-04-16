@@ -13,8 +13,8 @@ public class LivroService {
     @Autowired
     private LivroRepository livroRepository;
 
-    public Livro criarLivro(LivroDTO livroDTOdto) {
-        return livroRepository.save(LivroDTO.fromDTO(livroDTOdto));
+    public Livro criarLivro(LivroDTO livroDTO) {
+        return livroRepository.save(LivroDTO.fromDTO(livroDTO)); // Assume que existe LivroDTO.fromDTO()
     }
 
     public List<Livro> listarTodos() {
@@ -34,5 +34,10 @@ public class LivroService {
     }
     public List<Livro> listarPorEmprestimo(Long emprestimoId) {
         return livroRepository.findByEmprestimoId(emprestimoId);
+    }
+
+    public Livro findByIsbn(Long isbn) {
+        return livroRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new RuntimeException("Livro não encontrado com ISBN: " + isbn));
     }
 }

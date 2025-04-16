@@ -1,6 +1,9 @@
 package projetoBiblioteca.projetoBiblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Cliente {
@@ -14,8 +17,9 @@ public class Cliente {
     @Column(unique = true)
     private String cpf;
 
-    @OneToOne(mappedBy = "cliente")
-    private Emprestimo emprestimo;
+    @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
+    private List<Emprestimo> emprestimos;
 
      public Cliente () {
     }
@@ -48,14 +52,6 @@ public class Cliente {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
-    }
-
-    public Emprestimo getEmprestimo() {
-        return emprestimo;
-    }
-
-    public void setEmprestimo(Emprestimo emprestimo) {
-        this.emprestimo = emprestimo;
     }
 
     public Long getId() {

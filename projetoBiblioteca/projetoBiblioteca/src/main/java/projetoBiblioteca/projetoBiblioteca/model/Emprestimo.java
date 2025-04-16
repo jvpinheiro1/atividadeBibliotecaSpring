@@ -15,9 +15,12 @@ public class Emprestimo {
     private LocalDate dataInicial;
     private LocalDate dataDevolucao;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "emprestimo", cascade = CascadeType.ALL)
+    private List<EmprestimoLivro> livros;
 
 
 
@@ -48,6 +51,21 @@ public class Emprestimo {
         this.cliente = cliente;
     }
 
+    public Long getIdEmprestimo() {
+        return idEmprestimo;
+    }
+
+    public void setIdEmprestimo(Long idEmprestimo) {
+        this.idEmprestimo = idEmprestimo;
+    }
+
+    public List<EmprestimoLivro> getLivros() {
+        return livros;
+    }
+
+    public void setLivros(List<EmprestimoLivro> livros) {
+        this.livros = livros;
+    }
 
     public Long getId() {
         return idEmprestimo;

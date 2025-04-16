@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import projetoBiblioteca.projetoBiblioteca.dto.EmprestimoDTO;
 import projetoBiblioteca.projetoBiblioteca.model.Cliente;
 import projetoBiblioteca.projetoBiblioteca.model.Emprestimo;
+import projetoBiblioteca.projetoBiblioteca.model.EmprestimoLivro;
 import projetoBiblioteca.projetoBiblioteca.model.Livro;
 import projetoBiblioteca.projetoBiblioteca.repository.ClienteRepository;
+import projetoBiblioteca.projetoBiblioteca.repository.EmprestimoLivroRepository;
 import projetoBiblioteca.projetoBiblioteca.repository.EmprestimoRepository;
 import projetoBiblioteca.projetoBiblioteca.repository.LivroRepository;
 
@@ -20,29 +22,30 @@ public class EmprestimoService {
     private ClienteRepository clienteRepository;
     @Autowired
     private LivroRepository livroRepository;
+    @Autowired
+    private EmprestimoLivroRepository emprestimoLivroRepository;
 
     public Emprestimo criarEmprestimo(EmprestimoDTO dto) {
-        // Busca cliente
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        // Busca livros por ISBNs
         List<Livro> livros = livroRepository.findByIsbnIn(dto.getIsbns());
         if (livros.size() != dto.getIsbns().size()) {
-            throw new RuntimeException("ISBNs inválidos");
+            throw new RuntimeException("Alguns ISBNs não foram encontrados");
         }
 
-        // Cria empréstimo
         Emprestimo emprestimo = new Emprestimo();
         emprestimo.setDataInicial(dto.getDataInicial());
         emprestimo.setDataDevolucao(dto.getDataDevolucao());
         emprestimo.setCliente(cliente);
         Emprestimo emprestimoSalvo = emprestimoRepository.save(emprestimo);
 
-        // Associa livros ao empréstimo
+        // Cria as associações na tabela de junção
         for (Livro livro : livros) {
-            livro.setEmprestimo(emprestimoSalvo);
-            livroRepository.save(livro);
+            EmprestimoLivro emprestimoLivro = new EmprestimoLivro();
+            emprestimoLivro.setEmprestimo(emprestimoSalvo);
+            emprestimoLivro.setLivro(livro);
+            emprestimoLivroRepository.save(emprestimoLivro); // Agora deve funcionar
         }
 
         return emprestimoSalvo;
@@ -59,7 +62,12 @@ public class EmprestimoService {
         return emprestimoRepository.save(emprestimo);
     }
 
+    public Emprestimo findById(Long id) {
+        return emprestimoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado com o ID: " + id));
+    }
     public void excluirEmprestimo(Long id) {
+        emprestimoLivroRepository.deleteByEmprestimoId(id);
         emprestimoRepository.deleteById(id);
     }
 }

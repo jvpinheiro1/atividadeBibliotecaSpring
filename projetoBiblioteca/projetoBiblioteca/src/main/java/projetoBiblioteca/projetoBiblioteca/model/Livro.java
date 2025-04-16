@@ -1,6 +1,9 @@
 package projetoBiblioteca.projetoBiblioteca.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Livro {
@@ -16,14 +19,20 @@ public class Livro {
 
     private String genero;
 
-    @ManyToOne
-    @JoinColumn(name = "emprestimo_id") // Campo para relacionamento inverso
-    private Emprestimo emprestimo;
+    @OneToMany(mappedBy = "livro")
+    @JsonIgnore
+    private List<EmprestimoLivro> emprestimoLivros;
 
 
     public Livro() {
     }
 
+    public List<EmprestimoLivro> getEmprestimoLivros() {
+        return emprestimoLivros;
+    }
+    public void setEmprestimoLivros(List<EmprestimoLivro> emprestimoLivros) {
+        this.emprestimoLivros = emprestimoLivros;
+    }
     public String getAutor() {
         return autor;
     }
@@ -52,11 +61,5 @@ public class Livro {
         this.genero = genero;
     }
 
-    public Emprestimo getEmprestimo() {
-        return emprestimo;
-    }
 
-    public void setEmprestimo(Emprestimo emprestimo) {
-        this.emprestimo = emprestimo;
-    }
 }
