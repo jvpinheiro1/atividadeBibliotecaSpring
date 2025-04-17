@@ -1,393 +1,1273 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Biblioteca</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+        }
+        
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }
-
-        .tabs {
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e1e5eb;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .search-bar button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .action-buttons {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-
-        .tab-button {
+        
+        .btn {
             padding: 10px 20px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        .tab-button.active {
-            background-color: #0056b3;
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
         }
-
-        .form-container {
-            background: white;
-            padding: 20px;
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .card {
+            background-color: var(--white);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             margin-bottom: 20px;
         }
-
-        .form-group {
-            margin-bottom: 15px;
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
-
-        input, select {
+        
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        table {
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
+            border-collapse: collapse;
         }
-
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
             border: none;
-            border-radius: 5px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            position: relative;
+        }
+        
+        .tab-button.active {
+            color: var(--primary);
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+      
+        .dropdown {
+            display: none;
+            position: absolute;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+            border-radius: 4px;
+        }
+        
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: left;
+            border: none;
+            background: none;
             cursor: pointer;
         }
-
-        button.delete {
-            background-color: #dc3545;
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
         }
-
-        .list-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 5px 0;
         }
-
-        .item-card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
+    .search-select-container {
+        position: relative;
+    }
+    
+    .search-select-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .search-select-dropdown {
+        position: absolute;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        z-index: 1000;
+        display: none;
+    }
+    
+    .search-select-item {
+        padding: 10px;
+        cursor: pointer;
+    }
+    
+    .search-select-item:hover {
+        background-color: #f5f5f5;
+    }
     </style>
 </head>
 <body>
-    <h1>Sistema Biblioteca - Teste Endpoints</h1>
-    
-    <div class="tabs">
-        <button class="tab-button active" onclick="showTab('clientes', event)">Clientes</button>
-        <button class="tab-button" onclick="showTab('livros', event)">Livros</button>
-        <button class="tab-button" onclick="showTab('emprestimos', event)">Empréstimos</button>
-    </div>
-
-    <!-- Clientes Tab -->
-    <div id="clientes" class="tab-content">
-        <div class="form-container">
-            <h2>Cadastrar Cliente</h2>
-            <form id="clienteForm" onsubmit="event.preventDefault(); handleClienteSubmit()">
-                <div class="form-group">
-                    <input type="text" id="clienteNome" placeholder="Nome" required>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book-open"></i> Sistema Biblioteca</h1>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="btnClientes">
+                    <i class="fas fa-users"></i> Clientes
+                </button>
+                <button class="btn btn-secondary" id="btnLivros">
+                    <i class="fas fa-book"></i> Livros
+                </button>
+                <button class="btn btn-primary" id="btnNovoEmprestimo">
+                    <i class="fas fa-plus"></i> Novo Empréstimo
+                </button>
+                <div style="position: relative;">
+                    <button class="btn btn-primary" id="btnCadastros">
+                        <i class="fas fa-plus-circle"></i> Cadastros
+                    </button>
+                    <div class="dropdown" id="cadastrosDropdown">
+                        <button class="dropdown-item" id="btnNovoCliente">
+                            <i class="fas fa-user-plus"></i> Novo Cliente
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="btnNovoLivro">
+                            <i class="fas fa-book-medical"></i> Novo Livro
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="clienteSobrenome" placeholder="Sobrenome" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="clienteCpf" placeholder="CPF" required>
-                </div>
-                <button type="submit">Salvar Cliente</button>
-            </form>
-        </div>
-
-        <div class="list-container">
-            <h2>Clientes Cadastrados</h2>
-            <div id="clientesList"></div>
-        </div>
-    </div>
-
-    <!-- Livros Tab -->
-    <div id="livros" class="tab-content" style="display:none;">
-        <div class="form-container">
-            <h2>Cadastrar Livro</h2>
-            <form id="livroForm" onsubmit="event.preventDefault(); handleLivroSubmit()">
-                <div class="form-group">
-                    <input type="text" id="livroAutor" placeholder="Autor" required>
-                </div>
-                <div class="form-group">
-                    <input type="number" id="livroIsbn" placeholder="ISBN" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="livroGenero" placeholder="Gênero" required>
-                </div>
-                <button type="submit">Salvar Livro</button>
-            </form>
-        </div>
-
-        <div class="list-container">
-            <h2>Livros Cadastrados</h2>
-            <div id="livrosList"></div>
-        </div>
-    </div>
-
-    <!-- Empréstimos Tab -->
-    <div id="emprestimos" class="tab-content" style="display:none;">
-        <div class="form-container">
-            <h2>Novo Empréstimo</h2>
-            <form id="emprestimoForm" onsubmit="event.preventDefault(); handleEmprestimoSubmit()">
-                <div class="form-group">
-                    <input type="number" id="emprestimoClienteId" placeholder="ID do Cliente" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="emprestimoIsbns" placeholder="ISBNs dos Livros (separados por vírgula)" required>
-                </div>
-                <div class="form-group">
-                    <label>Data Inicial:</label>
-                    <input type="date" id="emprestimoDataInicial" required>
-                </div>
-                <div class="form-group">
-                    <label>Data Devolução:</label>
-                    <input type="date" id="emprestimoDataDevolucao" required>
-                </div>
-                <button type="submit">Criar Empréstimo</button>
-            </form>
-        </div>
-
-        <div class="list-container">
-            <h2>Empréstimos Ativos</h2>
-            <div id="emprestimosList"></div>
-        </div>
-
-        <div class="list-container">
-            <h2>Consultar Empréstimo</h2>
-            <div class="form-group">
-                <input type="number" id="consultaEmprestimoId" placeholder="ID do Empréstimo">
-                <button onclick="consultarEmprestimo()">Consultar</button>
             </div>
-            <div id="detalhesEmprestimo"></div>
-            <div id="livrosEmprestimoList" class="item-list"></div>
+        </header>
+        
+        <main>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Buscar empréstimos...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-list"></i> Empréstimos Ativos</h2>
+                    <div class="tabs">
+                        <button class="tab-button active" data-tab="todos">Todos</button>
+                        <button class="tab-button" data-tab="ativos">Ativos</button>
+                        <button class="tab-button" data-tab="atrasados">Atrasados</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Livros</th>
+                                <th>Data Empréstimo</th>
+                                <th>Data Devolução</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emprestimosTable">
+                            <!-- Dados serão carregados via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal Novo Empréstimo -->
+    <div class="modal" id="modalEmprestimo">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-plus-circle"></i> Novo Empréstimo</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="emprestimoForm">
+                    <div class="form-group search-select-container">
+                        <label for="clienteSearch">Cliente</label>
+                        <input type="text" class="form-control search-select-input" id="clienteSearch" placeholder="Digite para buscar cliente...">
+                        <div class="search-select-dropdown" id="clientesDropdown"></div>
+                        <input type="hidden" id="selectedClienteId">
+                    </div>
+                    
+                    <div class="form-group search-select-container">
+                        <label for="livroSearch">Livros</label>
+                        <input type="text" class="form-control search-select-input" id="livroSearch" placeholder="Digite título ou ISBN...">
+                        <div class="search-select-dropdown" id="livrosDropdown"></div>
+                        <div id="selectedLivros"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dataEmprestimo">Data do Empréstimo</label>
+                        <input type="date" class="form-control" id="dataEmprestimo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dataDevolucao">Data de Devolução</label>
+                        <input type="date" class="form-control" id="dataDevolucao" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEmprestimo">Cancelar</button>
+                <button class="btn btn-primary" id="saveEmprestimo">Salvar Empréstimo</button>
+            </div>
+        </div>
+    </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEmprestimo">Cancelar</button>
+                <button class="btn btn-primary" id="saveEmprestimo">Salvar Empréstimo</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Clientes -->
+    <div class="modal" id="modalClientes">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-users"></i> Lista de Clientes</h3>
+                <button class="modal-close" id="closeClientesModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar">
+                    <input type="text" id="searchCliente" placeholder="Buscar cliente por nome...">
+                    <button id="searchClienteButton"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Empréstimos Ativos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientesTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeClientesBtn">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Livros -->
+    <div class="modal" id="modalLivros">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-book"></i> Lista de Livros</h3>
+                <button class="modal-close" id="closeLivrosModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar">
+                    <input type="text" id="searchLivro" placeholder="Buscar livro por título ou ISBN...">
+                    <button id="searchLivroButton"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ISBN</th>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Disponível</th>
+                            </tr>
+                        </thead>
+                        <tbody id="livrosTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeLivrosBtn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastro Cliente -->
+    <div class="modal" id="modalCadastroCliente">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-plus"></i> Cadastrar Novo Cliente</h3>
+                <button class="modal-close" id="closeCadastroClienteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clienteForm">
+                    <div class="form-group">
+                        <label for="novoClienteNome">Nome</label>
+                        <input type="text" class="form-control" id="novoClienteNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="novoClienteSobrenome">Sobrenome</label>
+                        <input type="text" class="form-control" id="novoClienteSobrenome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="novoClienteCPF">CPF</label>
+                        <input type="text" class="form-control" id="novoClienteCPF" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelCadastroCliente">Cancelar</button>
+                <button class="btn btn-primary" id="saveCliente">Salvar Cliente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastro Livro -->
+    <div class="modal" id="modalCadastroLivro">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-book-medical"></i> Cadastrar Novo Livro</h3>
+                <button class="modal-close" id="closeCadastroLivroModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="livroForm">
+                    <div class="form-group">
+                        <label for="novoLivroTitulo">Título</label>
+                        <input type="text" class="form-control" id="novoLivroTitulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="novoLivroAutor">Autor</label>
+                        <input type="text" class="form-control" id="novoLivroAutor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="novoLivroISBN">ISBN</label>
+                        <input type="text" class="form-control" id="novoLivroISBN" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="novoLivroGenero">Gênero</label>
+                        <input type="text" class="form-control" id="novoLivroGenero" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelCadastroLivro">Cancelar</button>
+                <button class="btn btn-primary" id="saveLivro">Salvar Livro</button>
+            </div>
         </div>
     </div>
 
     <script>
-    // Funções para controle das abas
-    function showTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabName).style.display = 'block';
-        event.currentTarget.classList.add('active');
-    }
+        // API Base URL
+        const API_BASE = 'http://localhost:8080';
+        
+        // Elementos da interface
+        const modalEmprestimo = document.getElementById('modalEmprestimo');
+        const modalClientes = document.getElementById('modalClientes');
+        const modalLivros = document.getElementById('modalLivros');
+        const modalCadastroCliente = document.getElementById('modalCadastroCliente');
+        const modalCadastroLivro = document.getElementById('modalCadastroLivro');
+        
+        const btnNovoEmprestimo = document.getElementById('btnNovoEmprestimo');
+        const btnClientes = document.getElementById('btnClientes');
+        const btnLivros = document.getElementById('btnLivros');
+        const btnCadastros = document.getElementById('btnCadastros');
+        const btnNovoCliente = document.getElementById('btnNovoCliente');
+        const btnNovoLivro = document.getElementById('btnNovoLivro');
+        const cadastrosDropdown = document.getElementById('cadastrosDropdown');
+        
+        const closeModal1 = document.getElementById('closeModal');
+        const closeClientesModal = document.getElementById('closeClientesModal');
+        const closeLivrosModal = document.getElementById('closeLivrosModal');
+        const closeCadastroClienteModal = document.getElementById('closeCadastroClienteModal');
+        const closeCadastroLivroModal = document.getElementById('closeCadastroLivroModal');
+        
+        const closeClientesBtn = document.getElementById('closeClientesBtn');
+        const closeLivrosBtn = document.getElementById('closeLivrosBtn');
+        const cancelEmprestimo = document.getElementById('cancelEmprestimo');
+        const cancelCadastroCliente = document.getElementById('cancelCadastroCliente');
+        const cancelCadastroLivro = document.getElementById('cancelCadastroLivro');
+        
+        const saveEmprestimo = document.getElementById('saveEmprestimo');
+        const saveCliente = document.getElementById('saveCliente');
+        const saveLivro = document.getElementById('saveLivro');
+        
+        const emprestimoForm = document.getElementById('emprestimoForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchCliente = document.getElementById('searchCliente');
+        const searchClienteButton = document.getElementById('searchClienteButton');
+        const searchLivro = document.getElementById('searchLivro');
+        const searchLivroButton = document.getElementById('searchLivroButton');
+        
+        const emprestimosTable = document.getElementById('emprestimosTable');
+        const clientesTable = document.getElementById('clientesTable');
+        const livrosTable = document.getElementById('livrosTable');
+        const clienteSelect = document.getElementById('clienteSelect');
+        const livrosSelect = document.getElementById('livrosSelect');
+        const tabButtons = document.querySelectorAll('.tab-button');
 
-    // Configurações base
-    const API_BASE = 'http://localhost:8080';
-
-    // Helpers genéricos
-    async function fetchData(url, options = {}) {
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Fetch error:', error);
-            alert(`Erro: ${error.message}`);
-            throw error;
+        const clienteSearch = document.getElementById('clienteSearch');
+        const clientesDropdown = document.getElementById('clientesDropdown');
+        const selectedClienteId = document.getElementById('selectedClienteId');
+        const livroSearch = document.getElementById('livroSearch');
+        const livrosDropdown = document.getElementById('livrosDropdown');
+        const selectedLivros = document.getElementById('selectedLivros');
+        let selectedLivrosList = [];
+        
+        // Funções para controle dos modais
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
-    }
+        
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Event Listeners
+        btnNovoEmprestimo.addEventListener('click', () => {
+            openModal(modalEmprestimo);
+            loadClientesForSelect();
+            loadLivrosForSelect();
+        });
+        
+        btnClientes.addEventListener('click', () => {
+            openModal(modalClientes);
+            loadClientes();
+        });
+        
+        btnLivros.addEventListener('click', () => {
+            openModal(modalLivros);
+            loadLivros();
+        });
+        
+        btnCadastros.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cadastrosDropdown.style.display = cadastrosDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        btnNovoCliente.addEventListener('click', () => {
+            openModal(modalCadastroCliente);
+            cadastrosDropdown.style.display = 'none';
+        });
+        
+        btnNovoLivro.addEventListener('click', () => {
+            openModal(modalCadastroLivro);
+            cadastrosDropdown.style.display = 'none';
+        });
+        
+        closeModal1.addEventListener('click', () => closeModal(modalEmprestimo));
+        closeClientesModal.addEventListener('click', () => closeModal(modalClientes));
+        closeLivrosModal.addEventListener('click', () => closeModal(modalLivros));
+        closeCadastroClienteModal.addEventListener('click', () => closeModal(modalCadastroCliente));
+        closeCadastroLivroModal.addEventListener('click', () => closeModal(modalCadastroLivro));
+        
+        closeClientesBtn.addEventListener('click', () => closeModal(modalClientes));
+        closeLivrosBtn.addEventListener('click', () => closeModal(modalLivros));
+        cancelEmprestimo.addEventListener('click', () => closeModal(modalEmprestimo));
+        cancelCadastroCliente.addEventListener('click', () => closeModal(modalCadastroCliente));
+        cancelCadastroLivro.addEventListener('click', () => closeModal(modalCadastroLivro));
+        
+        // Fechar modais ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (e.target === modalEmprestimo) closeModal(modalEmprestimo);
+            if (e.target === modalClientes) closeModal(modalClientes);
+            if (e.target === modalLivros) closeModal(modalLivros);
+            if (e.target === modalCadastroCliente) closeModal(modalCadastroCliente);
+            if (e.target === modalCadastroLivro) closeModal(modalCadastroLivro);
+            
+            // Fechar dropdown ao clicar fora
+            if (!btnCadastros.contains(e.target) && !cadastrosDropdown.contains(e.target)) {
+                cadastrosDropdown.style.display = 'none';
+            }
+        });
+        
+        // Controle das abas
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                filterEmprestimos(button.dataset.tab);
+            });
+        });
+        
+        // Funções para carregar dados
+        async function fetchData(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error('Erro na requisição');
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Erro ao carregar dados');
+                throw error;
+            }
+        }
+        
+        async function loadEmprestimos() {
+            try {
+                const emprestimos = await fetchData(`${API_BASE}/emprestimo`);
+                renderEmprestimos(emprestimos);
+            } catch (error) {
+                console.error('Error loading emprestimos:', error);
+            }
+        }
+        
+        async function loadClientes() {
+            try {
+                const clientes = await fetchData(`${API_BASE}/cliente`);
+                renderClientes(clientes);
+            } catch (error) {
+                console.error('Error loading clientes:', error);
+            }
+        }
+        
+        async function loadLivros() {
+            try {
+                const livros = await fetchData(`${API_BASE}/livro`);
+                renderLivros(livros);
+            } catch (error) {
+                console.error('Error loading livros:', error);
+            }
+        }
+        
+        async function loadClientesForSelect() {
+            try {
+                const clientes = await fetchData(`${API_BASE}/cliente`);
+                clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+                clientes.forEach(cliente => {
+                    const option = document.createElement('option');
+                    option.value = cliente.id;
+                    option.textContent = `${cliente.nome} ${cliente.sobrenome} (${formatCPF(cliente.cpf)})`;
+                    clienteSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading clientes for select:', error);
+            }
+        }
+        
+        async function loadLivrosForSelect() {
+            try {
+                const livros = await fetchData(`${API_BASE}/livro`);
+                livrosSelect.innerHTML = '';
+                livros.forEach(livro => {
+                    if (livro.disponivel) {
+                        const option = document.createElement('option');
+                        option.value = livro.id;
+                        option.textContent = `${livro.titulo} (ISBN: ${livro.isbn}) - ${livro.autor}`;
+                        livrosSelect.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading livros for select:', error);
+            }
+        }
+        
+        // Funções para renderizar dados
+        function renderEmprestimos(emprestimos) {
+            emprestimosTable.innerHTML = '';
+            
+            if (emprestimos.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" style="text-align: center;">Nenhum empréstimo encontrado</td>`;
+                emprestimosTable.appendChild(row);
+                return;
+            }
+            
+            emprestimos.forEach(emprestimo => {
+                const row = document.createElement('tr');
+                
+                // Verifica se está atrasado
+                const hoje = new Date();
+                const devolucao = new Date(emprestimo.dataDevolucao);
+                const isAtrasado = hoje > devolucao;
+                
+                row.innerHTML = `
+                    <td>${emprestimo.id}</td>
+                    <td>${emprestimo.clienteNome}</td>
+                    <td>${emprestimo.livros.length} livro(s)</td>
+                    <td>${formatDate(emprestimo.dataInicial)}</td>
+                    <td>${formatDate(emprestimo.dataDevolucao)}</td>
+                    <td>
+                        <span class="badge ${isAtrasado ? 'badge-danger' : 'badge-success'}">
+                            ${isAtrasado ? 'Atrasado' : 'Em dia'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewEmprestimo(${emprestimo.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                emprestimosTable.appendChild(row);
+            });
+        }
+        
+        function renderClientes(clientes) {
+            clientesTable.innerHTML = '';
+            
+            clientes.forEach(cliente => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cliente.id}</td>
+                    <td>${cliente.nome} ${cliente.sobrenome}</td>
+                    <td>${formatCPF(cliente.cpf)}</td>
+                    <td>${cliente.emprestimosAtivos || 0}</td>
+                `;
+                clientesTable.appendChild(row);
+            });
+        }
+        
+        function renderLivros(livros) {
+            livrosTable.innerHTML = '';
+            
+            livros.forEach(livro => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${livro.isbn}</td>
+                    <td>${livro.titulo}</td>
+                    <td>${livro.autor}</td>
+                    <td>
+                        <span class="badge ${livro.disponivel ? 'badge-success' : 'badge-danger'}">
+                            ${livro.disponivel ? 'Sim' : 'Não'}
+                        </span>
+                    </td>
+                `;
+                livrosTable.appendChild(row);
+            });
+        }
+        
+        // Funções para cadastrar novos itens
+        saveCliente.addEventListener('click', async () => {
+            const cliente = {
+                nome: document.getElementById('novoClienteNome').value.trim(),
+                sobrenome: document.getElementById('novoClienteSobrenome').value.trim(),
+                cpf: document.getElementById('novoClienteCPF').value.replace(/\D/g, '')
+            };
 
-    function createItemCard(item, fields, deleteHandler) {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.innerHTML = fields.map(field => {
-            // Trata campos de data (CORRIGIDO)
-            if (field.key.includes('data') && item[field.key]) {
-                try {
-                    const date = new Date(item[field.key]);
-                    return `<p>${field.label}: ${date.toLocaleDateString()}</p>`;
-                } catch {
-                    return `<p>${field.label}: Data inválida</p>`;
+            if (!cliente.nome || !cliente.sobrenome || !cliente.cpf) {
+                alert('Preencha todos os campos obrigatórios');
+                return;
+            }
+
+            try {
+                const response = await fetchData(`${API_BASE}/cliente`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cliente)
+                });
+
+                alert('Cliente cadastrado com sucesso!');
+                document.getElementById('clienteForm').reset();
+                closeModal(modalCadastroCliente);
+                loadClientes();
+                loadClientesForSelect();
+            } catch (error) {
+                alert('Erro ao cadastrar cliente');
+                console.error(error);
+            }
+        });
+
+        saveLivro.addEventListener('click', async () => {
+            const livro = {
+                titulo: document.getElementById('novoLivroTitulo').value.trim(),
+                autor: document.getElementById('novoLivroAutor').value.trim(),
+                isbn: document.getElementById('novoLivroISBN').value.trim(),
+                genero: document.getElementById('novoLivroGenero').value.trim(),
+                disponivel: true // SEMPRE TRUE AO CRIAR UM NOVO LIVRO
+            };
+        
+            if (!livro.titulo || !livro.autor || !livro.isbn || !livro.genero) {
+                alert('Preencha todos os campos obrigatórios');
+                return;
+            }
+        
+            try {
+                const response = await fetchData(`${API_BASE}/livro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(livro)
+                });
+            
+                alert('Livro cadastrado com sucesso e disponível para empréstimo!');
+                document.getElementById('livroForm').reset();
+                closeModal(modalCadastroLivro);
+                loadLivros();
+                loadLivrosForSelect(); // Atualiza a lista de livros disponíveis
+            } catch (error) {
+                alert('Erro ao cadastrar livro');
+                console.error(error);
+            }
+        });
+
+        // Salvar novo empréstimo
+        saveEmprestimo.addEventListener('click', async () => {
+            const clienteId = clienteSelect.value;
+            const livrosIds = Array.from(livrosSelect.selectedOptions).map(opt => opt.value);
+            const dataEmprestimoValue = document.getElementById('dataEmprestimo').value;
+            const dataDevolucaoValue = document.getElementById('dataDevolucao').value;
+            
+            if (!clienteId || livrosIds.length === 0 || !dataEmprestimoValue || !dataDevolucaoValue) {
+                alert('Preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            try {
+                const response = await fetchData(`${API_BASE}/emprestimo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        clienteId,
+                        livrosIds,
+                        dataEmprestimo: dataEmprestimoValue,
+                        dataDevolucao: dataDevolucaoValue
+                    })
+                });
+                
+                alert('Empréstimo criado com sucesso!');
+                closeModal(modalEmprestimo);
+                loadEmprestimos();
+            } catch (error) {
+                alert('Erro ao criar empréstimo');
+                console.error(error);
+            }
+        });
+
+        // Funções auxiliares
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+        
+        function formatCPF(cpf) {
+            if (!cpf) return 'N/A';
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        
+        function filterEmprestimos(filter) {
+            // Implementar filtragem conforme necessário
+            console.log('Filtrar por:', filter);
+        }
+        
+        // Máscara para CPF
+        document.getElementById('novoClienteCPF')?.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 3) value = value.replace(/^(\d{3})(\d)/g, '$1.$2');
+            if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/g, '$1.$2.$3');
+            if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/g, '$1.$2.$3-$4');
+            if (value.length > 11) value = value.substring(0, 14);
+            this.value = value;
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEmprestimos();
+            
+            // Configurar busca
+            searchButton.addEventListener('click', () => {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    // Implementar busca
+                    console.log('Buscar:', searchTerm);
                 }
-            }
-            return `<p>${field.label}: ${item[field.key] || 'N/A'}</p>`;
-        }).join('');
+            });
+            
+            searchClienteButton.addEventListener('click', () => {
+                const searchTerm = searchCliente.value.trim();
+                if (searchTerm) {
+                    // Implementar busca de clientes
+                    console.log('Buscar cliente:', searchTerm);
+                }
+            });
+            
+            searchLivroButton.addEventListener('click', () => {
+                const searchTerm = searchLivro.value.trim();
+                if (searchTerm) {
+                    // Implementar busca de livros
+                    console.log('Buscar livro:', searchTerm);
+                }
+            });
+        });
         
-        if (deleteHandler) {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete';
-            deleteBtn.textContent = 'Excluir';
-            deleteBtn.onclick = () => deleteHandler(item.id);
-            card.appendChild(deleteBtn);
-        }
-        
-        return card;
-    }
-
-    // Clientes (mantido igual)
-    async function handleClienteSubmit() {
-        const cliente = {
-            nome: document.getElementById('clienteNome').value,
-            sobrenome: document.getElementById('clienteSobrenome').value,
-            cpf: document.getElementById('clienteCpf').value
+        // Funções globais
+        window.viewEmprestimo = function(id) {
+            alert(`Visualizar empréstimo ${id}`);
+            // Implementar visualização detalhada
         };
-
-        await fetchData(`${API_BASE}/cliente`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cliente)
-        });
-        loadClientes();
-    }
-
-    async function loadClientes() {
-        const clientes = await fetchData(`${API_BASE}/cliente`);
-        const list = document.getElementById('clientesList');
-        list.innerHTML = '';
-        clientes.forEach(cliente => {
-            list.appendChild(createItemCard(cliente, [
-                { label: 'Nome', key: 'nome' },
-                { label: 'Sobrenome', key: 'sobrenome' },
-                { label: 'CPF', key: 'cpf' }
-            ], deleteCliente));
-        });
-    }
-
-    async function deleteCliente(id) {
-        await fetchData(`${API_BASE}/cliente/${id}`, { method: 'DELETE' });
-        loadClientes();
-    }
-
-    // Livros (mantido igual)
-    async function handleLivroSubmit() {
-        const livro = {
-            autor: document.getElementById('livroAutor').value,
-            isbn: document.getElementById('livroIsbn').value,
-            genero: document.getElementById('livroGenero').value
-        };
-
-        await fetchData(`${API_BASE}/livro`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(livro)
-        });
-        loadLivros();
-    }
-
-    async function loadLivros() {
-        const livros = await fetchData(`${API_BASE}/livro`);
-        const list = document.getElementById('livrosList');
-        list.innerHTML = '';
-        livros.forEach(livro => {
-            list.appendChild(createItemCard(livro, [
-                { label: 'Autor', key: 'autor' },
-                { label: 'ISBN', key: 'isbn' },
-                { label: 'Gênero', key: 'genero' }
-            ], deleteLivro));
-        });
-    }
-
-    async function deleteLivro(id) {
-        await fetchData(`${API_BASE}/livro/${id}`, { method: 'DELETE' });
-        loadLivros();
-    }
-
-    // Empréstimos - Atualizado para nova estrutura
-    async function handleEmprestimoSubmit() {
-        const emprestimo = {
-            clienteId: parseInt(document.getElementById('emprestimoClienteId').value),
-            isbns: document.getElementById('emprestimoIsbns').value.split(',').map(Number),
-            dataInicial: document.getElementById('emprestimoDataInicial').value,
-            dataDevolucao: document.getElementById('emprestimoDataDevolucao').value
-        };
-
-        await fetchData(`${API_BASE}/emprestimo`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emprestimo)
-        });
-        alert('Empréstimo criado com sucesso!');
-        loadEmprestimos(); // Nova função para carregar empréstimos
-    }
-
-    // Nova função para carregar lista de empréstimos
-    async function loadEmprestimos() {
-        const emprestimos = await fetchData(`${API_BASE}/emprestimo`);
-        const list = document.getElementById('emprestimosList');
-        if (!list) return;
-        
-        list.innerHTML = '';
-        emprestimos.forEach(emp => {
-            list.appendChild(createItemCard(emp, [
-                { label: 'ID', key: 'idEmprestimo' },
-                { label: 'Data Inicial', key: 'dataInicial' },
-                { label: 'Data Devolução', key: 'dataDevolucao' },
-                { label: 'Cliente ID', key: 'clienteId' },
-            ], deleteEmprestimo));
-        });
-    }
-
-    async function deleteEmprestimo(id) {
-        await fetchData(`${API_BASE}/emprestimo/${id}`, { method: 'DELETE' });
-        loadEmprestimos();
-    }
-
-    // Consulta de empréstimos atualizada
-    async function consultarEmprestimo() {
-        const emprestimoId = document.getElementById('consultaEmprestimoId').value;
-        if (!emprestimoId) {
-            alert('Por favor, insira um ID de empréstimo');
+        clienteSearch.addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length < 2) {
+            clientesDropdown.style.display = 'none';
             return;
         }
 
         try {
-            const emprestimo = await fetchData(`${API_BASE}/emprestimo/${emprestimoId}`);
-            const detalhesDiv = document.getElementById('detalhesEmprestimo');
-            
-            detalhesDiv.innerHTML = `
-                <h3>Detalhes do Empréstimo</h3>
-                <p>ID: ${emprestimo.idEmprestimo}</p>
-                <p>Data Inicial: ${new Date(emprestimo.dataInicial).toLocaleDateString()}</p>
-                <p>Data Devolução: ${new Date(emprestimo.dataDevolucao).toLocaleDateString()}</p>
-                <p>Cliente: ${emprestimo.clienteNome} (ID: ${emprestimo.clienteId})</p>
-                <h4>Livros:</h4>
-                <div id="livrosEmprestimoList" class="item-list"></div>
-            `;
-
-            // Mostra os livros do empréstimo
-            const livrosList = document.getElementById('livrosEmprestimoList');
-            if (emprestimo.livrosIsbn && emprestimo.livrosIsbn.length > 0) {
-                // Aqui você pode buscar os detalhes completos dos livros se necessário
-                (emprestimo.isbns || []).forEach(isbn => {
-                    livrosList.appendChild(createItemCard({ isbn }, [
-                        { label: 'ISBN', key: 'isbn' }
-                    ]));
-                });
-            } else {
-                livrosList.innerHTML = '<p>Nenhum livro encontrado para este empréstimo</p>';
-            }
+            const clientes = await fetchData(`${API_BASE}/cliente?nome=${searchTerm}`);
+            renderClientesDropdown(clientes);
         } catch (error) {
-            console.error('Erro ao consultar empréstimo:', error);
+            console.error('Error searching clientes:', error);
         }
+    });
+
+    function renderClientesDropdown(clientes) {
+        clientesDropdown.innerHTML = '';
+        
+        if (clientes.length === 0) {
+            clientesDropdown.innerHTML = '<div class="search-select-item">Nenhum cliente encontrado</div>';
+            clientesDropdown.style.display = 'block';
+            return;
+        }
+
+        clientes.forEach(cliente => {
+            const item = document.createElement('div');
+            item.className = 'search-select-item';
+            item.textContent = `${cliente.nome} ${cliente.sobrenome} (${formatCPF(cliente.cpf)})`;
+            item.addEventListener('click', () => {
+                clienteSearch.value = `${cliente.nome} ${cliente.sobrenome}`;
+                selectedClienteId.value = cliente.id;
+                clientesDropdown.style.display = 'none';
+            });
+            clientesDropdown.appendChild(item);
+        });
+
+        clientesDropdown.style.display = 'block';
+    }
+    livroSearch.addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length < 2) {
+            livrosDropdown.style.display = 'none';
+            return;
+        }
+
+        try {
+            const livros = await fetchData(`${API_BASE}/livro?search=${searchTerm}`);
+            renderLivrosDropdown(livros);
+        } catch (error) {
+            console.error('Error searching livros:', error);
+        }
+    });
+
+    function renderLivrosDropdown(livros) {
+        livrosDropdown.innerHTML = '';
+        
+        // Filtra apenas livros disponíveis
+        const livrosDisponiveis = livros.filter(livro => livro.disponivel);
+        
+        if (livrosDisponiveis.length === 0) {
+            livrosDropdown.innerHTML = '<div class="search-select-item">Nenhum livro disponível encontrado</div>';
+            livrosDropdown.style.display = 'block';
+            return;
+        }
+
+        livrosDisponiveis.forEach(livro => {
+            const item = document.createElement('div');
+            item.className = 'search-select-item';
+            item.textContent = `${livro.titulo} (${livro.isbn}) - ${livro.autor}`;
+            item.addEventListener('click', () => {
+                addLivroToSelection(livro);
+                livroSearch.value = '';
+                livrosDropdown.style.display = 'none';
+            });
+            livrosDropdown.appendChild(item);
+        });
+
+        livrosDropdown.style.display = 'block';
     }
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-        loadClientes();
-        loadLivros();
-        loadEmprestimos(); // Carrega empréstimos ao iniciar
+    function addLivroToSelection(livro) {
+        // Verifica se o livro já foi selecionado
+        if (selectedLivrosList.some(l => l.id === livro.id)) {
+            alert('Este livro já foi selecionado');
+            return;
+        }
+
+        selectedLivrosList.push(livro);
+        renderSelectedLivros();
+    }
+
+    function renderSelectedLivros() {
+        selectedLivros.innerHTML = '';
         
-        // Adiciona máscara para ISBNs no formulário de empréstimo
-        document.getElementById('emprestimoIsbns')?.addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9,]/g, '');
+        if (selectedLivrosList.length === 0) {
+            selectedLivros.innerHTML = '<p>Nenhum livro selecionado</p>';
+            return;
+        }
+
+        const list = document.createElement('ul');
+        selectedLivrosList.forEach((livro, index) => {
+            const item = document.createElement('li');
+            item.style.margin = '5px 0';
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            
+            item.innerHTML = `
+                <span>${livro.titulo} (ISBN: ${livro.isbn})</span>
+                <button class="btn btn-danger btn-sm" data-index="${index}" style="padding: 2px 5px; font-size: 12px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            list.appendChild(item);
         });
+
+        selectedLivros.appendChild(list);
+
+        // Adiciona eventos para remover livros
+        selectedLivros.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.closest('button').dataset.index);
+                selectedLivrosList.splice(index, 1);
+                renderSelectedLivros();
+            });
+        });
+    }
+
+    // Atualize a função de salvar empréstimo
+    saveEmprestimo.addEventListener('click', async () => {
+        const clienteId = selectedClienteId.value;
+        const livrosIds = selectedLivrosList.map(livro => livro.id);
+        const dataEmprestimoValue = document.getElementById('dataEmprestimo').value;
+        const dataDevolucaoValue = document.getElementById('dataDevolucao').value;
+        
+        if (!clienteId || livrosIds.length === 0 || !dataEmprestimoValue || !dataDevolucaoValue) {
+            alert('Preencha todos os campos obrigatórios');
+            return;
+        }
+        
+        try {
+            const response = await fetchData(`${API_BASE}/emprestimo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    clienteId,
+                    livrosIds,
+                    dataEmprestimo: dataEmprestimoValue,
+                    dataDevolucao: dataDevolucaoValue
+                })
+            });
+            
+            alert('Empréstimo criado com sucesso!');
+            closeModal(modalEmprestimo);
+            // Resetar seleções
+            selectedClienteId.value = '';
+            clienteSearch.value = '';
+            selectedLivrosList = [];
+            renderSelectedLivros();
+            loadEmprestimos();
+        } catch (error) {
+            alert('Erro ao criar empréstimo');
+            console.error(error);
+        }
     });
-</script>
+
+    // Fechar dropdowns ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (!clienteSearch.contains(e.target) && !clientesDropdown.contains(e.target)) {
+            clientesDropdown.style.display = 'none';
+        }
+        
+        if (!livroSearch.contains(e.target) && !livrosDropdown.contains(e.target)) {
+            livrosDropdown.style.display = 'none';
+        }
+    });
+
+    </script>
 </body>
 </html>

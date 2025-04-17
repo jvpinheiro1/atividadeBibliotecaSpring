@@ -12,6 +12,8 @@ public class Livro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idLivro;
 
+    private String titulo;
+
     private String autor;
 
     @Column(unique = true)
@@ -61,5 +63,11 @@ public class Livro {
         this.genero = genero;
     }
 
+    public String getTitulo() {
+        return titulo;
+    }
 
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 }

@@ -23,6 +23,7 @@ public class LivroService {
 
     public Livro atualizarLivro(Long idLivro, LivroDTO livroDTOdto) {
         Livro livro = livroRepository.findById(idLivro).orElseThrow();
+        livro.setTitulo(livroDTOdto.getTitulo());
         livro.setAutor(livroDTOdto.getAutor());
         livro.setIsbn(livroDTOdto.getIsbn());
         livro.setGenero(livroDTOdto.getGenero());
